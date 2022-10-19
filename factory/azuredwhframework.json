@@ -1,0 +1,9 @@
+{
+	"name": "azuredwhframework",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "70c737c6-625c-4bfe-9c1d-00f8716b4a7b",
+		"tenantId": "6e0a5f83-1728-4956-bdf4-ce37760cd214"
+	}
+}
