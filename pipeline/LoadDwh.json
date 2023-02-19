@@ -1,0 +1,113 @@
+{
+	"name": "LoadDwh",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetLayers",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[etl].[p_GetDwhLayers]",
+						"storedProcedureParameters": {
+							"Area": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dtsDwhMapping",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "LoadDWHLayer",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetLayers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetLayerMapping').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "LoadDWH_TableGroup",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitOnCompletion": true,
+								"parameters": {
+									"Layer": {
+										"value": "@item().Layer",
+										"type": "Expression"
+									},
+									"Area": {
+										"value": "@pipeline().parameters.Area",
+										"type": "Expression"
+									},
+									"Inserted_SK": {
+										"value": "@pipeline().parameters.Inserted_SK",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"Inserted_SK": {
+				"type": "string",
+				"defaultValue": "-1"
+			},
+			"Updated_SK": {
+				"type": "string",
+				"defaultValue": "-1"
+			},
+			"Area": {
+				"type": "string",
+				"defaultValue": "Sales"
+			}
+		},
+		"variables": {
+			"ETLLog_SK": {
+				"type": "String",
+				"defaultValue": "-1"
+			}
+		},
+		"folder": {
+			"name": "ETL/DWH"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-02-03T15:22:30Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
