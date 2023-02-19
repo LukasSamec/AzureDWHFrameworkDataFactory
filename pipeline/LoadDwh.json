@@ -51,32 +51,22 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetLayerMapping').output.value",
+						"value": "@activity('GetLayers').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "LoadDWH_TableGroup",
+							"name": "LoadDwhLayer",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"Layer": {
-										"value": "@item().Layer",
-										"type": "Expression"
-									},
-									"Area": {
-										"value": "@pipeline().parameters.Area",
-										"type": "Expression"
-									},
-									"Inserted_SK": {
-										"value": "@pipeline().parameters.Inserted_SK",
-										"type": "Expression"
-									}
-								}
+								"pipeline": {
+									"referenceName": "LoadDwhLayer",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
 							}
 						}
 					]

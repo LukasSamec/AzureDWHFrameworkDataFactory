@@ -42,6 +42,10 @@
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
+					"dataset": {
+						"referenceName": "dtsDwhMapping",
+						"type": "DatasetReference"
+					},
 					"firstRowOnly": false
 				}
 			},
@@ -90,6 +94,10 @@
 										"type": "Int32"
 									}
 								}
+							},
+							"linkedServiceName": {
+								"referenceName": "DWH",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
@@ -140,6 +148,10 @@
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dtsDwhMapping",
+						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
