@@ -80,6 +80,366 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LoadDwh')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetLayers",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[etl].[p_GetDwhLayers]",
+								"storedProcedureParameters": {
+									"Area": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.Area",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dtsDwhMapping",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "LoadDWHLayer",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetLayers",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetLayers').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "LoadDwhLayer",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "LoadDwhLayer",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Inserted_SK": {
+						"type": "string",
+						"defaultValue": "-1"
+					},
+					"Updated_SK": {
+						"type": "string",
+						"defaultValue": "-1"
+					},
+					"Area": {
+						"type": "string",
+						"defaultValue": "Sales"
+					}
+				},
+				"variables": {
+					"ETLLog_SK": {
+						"type": "String",
+						"defaultValue": "-1"
+					}
+				},
+				"folder": {
+					"name": "Dwh"
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-02-03T15:22:30Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
+				"[concat(variables('factoryId'), '/pipelines/LoadDwhLayer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LoadDwhLayer')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "\n",
+				"activities": [
+					{
+						"name": "Get Dimensions DWH mapping",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[etl].[p_GetDwhMapping]",
+								"storedProcedureParameters": {
+									"Area": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.Area",
+											"type": "Expression"
+										}
+									},
+									"Layer": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.Layer",
+											"type": "Expression"
+										}
+									},
+									"TableType": {
+										"type": "String",
+										"value": "Dimension"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dtsDwhMapping",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Load Dimensions",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Dimensions DWH mapping",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Dimensions DWH mapping').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Load dimension",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@item().LoadingProcedureName",
+											"type": "Expression"
+										},
+										"storedProcedureParameters": {
+											"ETLLog_SK": {
+												"value": {
+													"value": "@int(pipeline().parameters.Inserted_SK)",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "DWH",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get Facts DWH mapping",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Load Dimensions",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[etl].[p_GetDwhMapping]",
+								"storedProcedureParameters": {
+									"Area": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.Area",
+											"type": "Expression"
+										}
+									},
+									"Layer": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.Layer",
+											"type": "Expression"
+										}
+									},
+									"TableType": {
+										"type": "String",
+										"value": "Fact"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dtsDwhMapping",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Load Facts",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Facts DWH mapping",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Facts DWH mapping').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Load Fact",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@item().LoadingProcedureName",
+											"type": "Expression"
+										},
+										"storedProcedureParameters": {
+											"ETLLog_SK": {
+												"value": {
+													"value": "@int(pipeline().parameters.Inserted_SK)",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "DWH",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Layer": {
+						"type": "string",
+						"defaultValue": "2"
+					},
+					"Area": {
+						"type": "string",
+						"defaultValue": "Sales"
+					},
+					"Inserted_SK": {
+						"type": "string",
+						"defaultValue": "-1"
+					}
+				},
+				"folder": {
+					"name": "Dwh"
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-02-03T15:22:28Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
+				"[concat(variables('factoryId'), '/linkedServices/DWH')]"
+			]
 		}
 	]
 }
