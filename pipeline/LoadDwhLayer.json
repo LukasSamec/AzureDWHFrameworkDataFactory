@@ -88,7 +88,7 @@
 								"storedProcedureParameters": {
 									"ETLLog_SK": {
 										"value": {
-											"value": "@int(pipeline().parameters.Inserted_SK)",
+											"value": "@int(pipeline().parameters.ETLLogInsertedID)",
 											"type": "Expression"
 										},
 										"type": "Int32"
@@ -195,7 +195,7 @@
 								"storedProcedureParameters": {
 									"ETLLog_SK": {
 										"value": {
-											"value": "@int(pipeline().parameters.Inserted_SK)",
+											"value": "@int(pipeline().parameters.ETLLogInsertedID)",
 											"type": "Expression"
 										},
 										"type": "Int32"
@@ -214,13 +214,13 @@
 		"parameters": {
 			"Layer": {
 				"type": "string",
-				"defaultValue": "2"
+				"defaultValue": "1"
 			},
 			"Area": {
 				"type": "string",
 				"defaultValue": "Sales"
 			},
-			"Inserted_SK": {
+			"ETLLogInsertedID": {
 				"type": "string",
 				"defaultValue": "-1"
 			}

@@ -66,7 +66,17 @@
 									"referenceName": "LoadDwhLayer",
 									"type": "PipelineReference"
 								},
-								"waitOnCompletion": true
+								"waitOnCompletion": true,
+								"parameters": {
+									"Layer": {
+										"value": "@item().Layer",
+										"type": "Expression"
+									},
+									"Area": {
+										"value": "@pipeline().parameters.Area",
+										"type": "Expression"
+									}
+								}
 							}
 						}
 					]
@@ -74,11 +84,11 @@
 			}
 		],
 		"parameters": {
-			"Inserted_SK": {
+			"ETLLogInsertedID": {
 				"type": "string",
 				"defaultValue": "-1"
 			},
-			"Updated_SK": {
+			"ETLLogUpdatedID": {
 				"type": "string",
 				"defaultValue": "-1"
 			},
