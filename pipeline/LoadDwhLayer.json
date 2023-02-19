@@ -226,7 +226,7 @@
 			}
 		},
 		"folder": {
-			"name": "ETL/DWH"
+			"name": "Dwh"
 		},
 		"annotations": [],
 		"lastPublishTime": "2022-02-03T15:22:28Z"
