@@ -153,7 +153,16 @@
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
-										"parameters": {}
+										"parameters": {
+											"Layer": {
+												"value": "@item().Layer",
+												"type": "Expression"
+											},
+											"Area": {
+												"value": "@pipeline().parameters.Area",
+												"type": "Expression"
+											}
+										}
 									}
 								}
 							]
@@ -165,11 +174,7 @@
 					"cancelAfter": {}
 				},
 				"parameters": {
-					"Inserted_SK": {
-						"type": "string",
-						"defaultValue": "-1"
-					},
-					"Updated_SK": {
+					"ETLLogID": {
 						"type": "string",
 						"defaultValue": "-1"
 					},
@@ -288,7 +293,7 @@
 										"storedProcedureParameters": {
 											"ETLLog_SK": {
 												"value": {
-													"value": "@int(pipeline().parameters.Inserted_SK)",
+													"value": "@int(pipeline().parameters.ETLLogID)",
 													"type": "Expression"
 												},
 												"type": "Int32"
@@ -396,7 +401,7 @@
 										"storedProcedureParameters": {
 											"ETLLog_SK": {
 												"value": {
-													"value": "@int(pipeline().parameters.Inserted_SK)",
+													"value": "@int(pipeline().parameters.ETLLogID)",
 													"type": "Expression"
 												},
 												"type": "Int32"
@@ -419,13 +424,13 @@
 				"parameters": {
 					"Layer": {
 						"type": "string",
-						"defaultValue": "2"
+						"defaultValue": "1"
 					},
 					"Area": {
 						"type": "string",
 						"defaultValue": "Sales"
 					},
-					"Inserted_SK": {
+					"ETLLogID": {
 						"type": "string",
 						"defaultValue": "-1"
 					}
@@ -439,6 +444,37 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
 				"[concat(variables('factoryId'), '/linkedServices/DWH')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Main')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Load Dwh",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LoadDwh",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/LoadDwh')]"
 			]
 		}
 	]
