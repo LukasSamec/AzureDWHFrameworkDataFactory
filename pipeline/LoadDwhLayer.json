@@ -4,7 +4,7 @@
 		"description": "\n",
 		"activities": [
 			{
-				"name": "Get Dimensions DWH mapping",
+				"name": "Get Dimension Tables",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -50,11 +50,11 @@
 				}
 			},
 			{
-				"name": "Load Dimensions",
+				"name": "Load Dimension Tables",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Dimensions DWH mapping",
+						"activity": "Get Dimension Tables",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -63,13 +63,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Dimensions DWH mapping').output.value",
+						"value": "@activity('Get Dimension Tables').output.value",
 						"type": "Expression"
 					},
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "Load dimension",
+							"name": "Load Dimension Table",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
@@ -104,11 +104,11 @@
 				}
 			},
 			{
-				"name": "Get Facts DWH mapping",
+				"name": "Get Fact Tables",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Load Dimensions",
+						"activity": "Load Dimension Tables",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -157,11 +157,11 @@
 				}
 			},
 			{
-				"name": "Load Facts",
+				"name": "Load Fact Tables",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Facts DWH mapping",
+						"activity": "Get Fact Tables",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -170,13 +170,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Facts DWH mapping').output.value",
+						"value": "@activity('Get Fact Tables').output.value",
 						"type": "Expression"
 					},
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "Load Fact",
+							"name": "Load Fact Table",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
