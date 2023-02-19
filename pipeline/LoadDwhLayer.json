@@ -201,6 +201,10 @@
 										"type": "Int32"
 									}
 								}
+							},
+							"linkedServiceName": {
+								"referenceName": "DWH",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
