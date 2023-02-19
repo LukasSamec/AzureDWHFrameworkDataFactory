@@ -84,11 +84,7 @@
 			}
 		],
 		"parameters": {
-			"ETLLogInsertedID": {
-				"type": "string",
-				"defaultValue": "-1"
-			},
-			"ETLLogUpdatedID": {
+			"ETLLogID": {
 				"type": "string",
 				"defaultValue": "-1"
 			},
