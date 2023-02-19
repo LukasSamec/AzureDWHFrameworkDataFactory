@@ -38,7 +38,7 @@
 				}
 			},
 			{
-				"name": "LoadDWHLayer",
+				"name": "LoadDwhLayers",
 				"type": "ForEach",
 				"dependsOn": [
 					{
