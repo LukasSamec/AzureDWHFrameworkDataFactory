@@ -301,7 +301,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[etl].[p_WriteETLError]",
 								"storedProcedureParameters": {
 									"Comment": {
 										"value": {
@@ -312,7 +311,7 @@
 									},
 									"ETLLog_SK": {
 										"value": {
-											"value": "@pipeline().parameters.Inserted_SK",
+											"value": "@pipeline().parameters.ETLLogID",
 											"type": "Expression"
 										},
 										"type": "Int32"
@@ -332,6 +331,10 @@
 										"type": "DateTime"
 									}
 								}
+							},
+							"linkedServiceName": {
+								"referenceName": "DWH",
+								"type": "LinkedServiceReference"
 							}
 						},
 						{
