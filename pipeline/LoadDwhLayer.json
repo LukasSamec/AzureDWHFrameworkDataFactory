@@ -86,7 +86,7 @@
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
-									"ETLLog_SK": {
+									"ETLLogID": {
 										"value": {
 											"value": "@int(pipeline().parameters.ETLLogID)",
 											"type": "Expression"
@@ -193,7 +193,7 @@
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
-									"ETLLog_SK": {
+									"ETLLogID": {
 										"value": {
 											"value": "@int(pipeline().parameters.ETLLogID)",
 											"type": "Expression"
