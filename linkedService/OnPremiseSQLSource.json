@@ -5,8 +5,9 @@
 		"annotations": [],
 		"type": "SqlServer",
 		"typeProperties": {
-			"connectionString": "integrated security=False;data source=LAPTOP-NBJCJG95;initial catalog=FrameworkDBSource;user id=lukas.samec",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJmYjZiNzA3Ny0wYjUxLTRhOWItYTY1Zi01ZmIyZTFiYzkzZGYiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"connectionString": "integrated security=True;data source=LAPTOP-NBJCJG95;initial catalog=FrameworkDBSource",
+			"userName": "LAPTOP-NBJCJG95\\lukas",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJmZjgyNzIxMS1iMmVlLTQwZDMtYjIxOC0zZDI2YTI4MDdiODgiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "Self-HostedIntegrationRuntime",
