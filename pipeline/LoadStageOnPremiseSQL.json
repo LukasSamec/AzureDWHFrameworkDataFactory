@@ -80,16 +80,16 @@
 									"type": "SqlServerSource",
 									"additionalColumns": [
 										{
-											"name": "Inserted_SK",
+											"name": "InsertedETLLogID",
 											"value": {
-												"value": "@pipeline().parameters.Inserted_SK",
+												"value": "@pipeline().parameters.ETLLogID",
 												"type": "Expression"
 											}
 										},
 										{
-											"name": "Updated_SK",
+											"name": "UpdatedETLLogID",
 											"value": {
-												"value": "@pipeline().parameters.Updated_SK",
+												"value": "@pipeline().parameters.ETLLogID",
 												"type": "Expression"
 											}
 										}
@@ -101,8 +101,54 @@
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
-								"enableStaging": false
-							}
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": true,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "dtsOnPremiseSQL",
+									"type": "DatasetReference",
+									"parameters": {
+										"SchemaName": {
+											"value": "@item().SourceSchema",
+											"type": "Expression"
+										},
+										"TableName": {
+											"value": "@item().SourceTable",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "dtsDwhStage",
+									"type": "DatasetReference",
+									"parameters": {
+										"SchemaName": {
+											"value": "@item().TargetSchema",
+											"type": "Expression"
+										},
+										"TableName": {
+											"value": "@item().TargetTable",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						},
 						{
 							"name": "Stored Procedure success",
