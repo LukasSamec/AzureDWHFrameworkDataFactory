@@ -19,13 +19,30 @@
 						"referenceName": "LoadDwh",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"ETLLogID": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						},
+						"Area": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "LoadStage",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "AssignETLLogIDToVariable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
@@ -34,10 +51,97 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
+						"ETLLogID": {
+							"value": "@variables('ETLLogID')",
+							"type": "Expression"
+						},
 						"Area": {
 							"value": "@pipeline().parameters.Area",
 							"type": "Expression"
 						}
+					}
+				}
+			},
+			{
+				"name": "WriteETLLog",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[log].[p_WriteETLLog]",
+						"storedProcedureParameters": {
+							"PipelineName": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								}
+							},
+							"PipelineRunId": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"PipelineTriggerId": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().TriggerId",
+									"type": "Expression"
+								}
+							},
+							"PipelineTriggerTime": {
+								"type": "DateTime",
+								"value": {
+									"value": "@pipeline().TriggerTime",
+									"type": "Expression"
+								}
+							},
+							"Status": {
+								"type": "Int32",
+								"value": "1"
+							},
+							"StatusDescription": {
+								"type": "String",
+								"value": "Running"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dtsStageMapping",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "AssignETLLogIDToVariable",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WriteETLLog",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ETLLogID",
+					"value": {
+						"value": "@string(activity('WriteETLLog').output.firstRow.SCOPE_IDENTITY)",
+						"type": "Expression"
 					}
 				}
 			}
@@ -45,6 +149,11 @@
 		"parameters": {
 			"Area": {
 				"type": "string"
+			}
+		},
+		"variables": {
+			"ETLLogID": {
+				"type": "String"
 			}
 		},
 		"annotations": []
