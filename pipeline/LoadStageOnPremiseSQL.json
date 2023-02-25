@@ -1,0 +1,396 @@
+{
+	"name": "LoadStageOnPremiseSQL",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetStageMapping",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[etl].[p_GetStageMapping]",
+						"storedProcedureParameters": {
+							"Area": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dtsStageMapping",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "LoadToStage",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetStageMapping",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetStageMapping').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Load Stage Table",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Write and Get last ETLTableLoadLog_SK",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 2,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"additionalColumns": [
+										{
+											"name": "Inserted_SK",
+											"value": {
+												"value": "@pipeline().parameters.Inserted_SK",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "Updated_SK",
+											"value": {
+												"value": "@pipeline().parameters.Updated_SK",
+												"type": "Expression"
+											}
+										}
+									],
+									"sqlReaderQuery": {
+										"value": "@item().SelectQuery",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"enableStaging": false
+							}
+						},
+						{
+							"name": "Stored Procedure success",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Load Stage Table",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[p_UpdateETLTableLoadLog]",
+								"storedProcedureParameters": {
+									"Deleted": {
+										"value": "0",
+										"type": "Int32"
+									},
+									"EndTime": {
+										"value": {
+											"value": "@getFutureTime(2,'Hour')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ETLTableLoadLog_SK": {
+										"value": {
+											"value": "@int(activity('Write and Get last ETLTableLoadLog_SK').output.firstRow.SCOPE_IDENTITY)",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"Inserted": {
+										"value": {
+											"value": "@activity('Load Stage Table').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"Status": {
+										"value": "2",
+										"type": "Int32"
+									},
+									"StatusDescription": {
+										"value": "Done",
+										"type": "String"
+									},
+									"Updated": {
+										"value": "0",
+										"type": "Int32"
+									},
+									"BillableDuration": {
+										"value": {
+											"value": "@activity('Load Stage Table').output.billingReference.billableDuration[0].duration",
+											"type": "Expression"
+										},
+										"type": "Decimal"
+									}
+								}
+							}
+						},
+						{
+							"name": "Stored Procedure error",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Load Stage Table",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[p_UpdateETLTableLoadLog]",
+								"storedProcedureParameters": {
+									"Deleted": {
+										"value": "0",
+										"type": "Int32"
+									},
+									"EndTime": {
+										"value": {
+											"value": "@getFutureTime(2,'Hour')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ETLTableLoadLog_SK": {
+										"value": {
+											"value": "@int(activity('Write and Get last ETLTableLoadLog_SK').output.firstRow.SCOPE_IDENTITY)",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"Inserted": {
+										"value": {
+											"value": "@activity('Load Stage Table').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"Status": {
+										"value": "3",
+										"type": "Int32"
+									},
+									"StatusDescription": {
+										"value": "Error",
+										"type": "String"
+									},
+									"Updated": {
+										"value": "0",
+										"type": "Int32"
+									}
+								}
+							}
+						},
+						{
+							"name": "Write error",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Stored Procedure error",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[p_WriteETLError]",
+								"storedProcedureParameters": {
+									"Comment": {
+										"value": {
+											"value": "@{activity('Load Stage Table').Error.Message}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ETLLog_SK": {
+										"value": {
+											"value": "@pipeline().parameters.Inserted_SK",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ETLTableLoadLog_SK": {
+										"value": {
+											"value": "@int(activity('Write and Get last ETLTableLoadLog_SK').output.firstRow.SCOPE_IDENTITY)",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"StartTime": {
+										"value": {
+											"value": "@getFutureTime(2,'Hour')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									}
+								}
+							}
+						},
+						{
+							"name": "Write and Get last ETLTableLoadLog_SK",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderStoredProcedureName": "[etl].[p_WriteETLTableLoadLog]",
+									"storedProcedureParameters": {
+										"ETLLogID": {
+											"type": "Int32",
+											"value": {
+												"value": "@int(pipeline().parameters.ETLLogID)",
+												"type": "Expression"
+											}
+										},
+										"Name": {
+											"type": "String",
+											"value": {
+												"value": "@concat(item().TargetSchema,'.',item().TargetTable)",
+												"type": "Expression"
+											}
+										},
+										"NewTableLoadLog_SK": {
+											"type": "Int32",
+											"value": null
+										},
+										"StartTime": {
+											"type": "DateTime",
+											"value": {
+												"value": "@getFutureTime(2, 'Hour')",
+												"type": "Expression"
+											}
+										},
+										"Status": {
+											"type": "Int32",
+											"value": "1"
+										},
+										"StatusDescription": {
+											"type": "String",
+											"value": "Running"
+										},
+										"Type": {
+											"type": "String",
+											"value": "Copy Data"
+										},
+										"TargetTableName": {
+											"type": "String",
+											"value": {
+												"value": "@item().TargetTable",
+												"type": "Expression"
+											}
+										},
+										"TargetSchemaName": {
+											"type": "String",
+											"value": {
+												"value": "@item().TargetSchema",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "dtsStageMapping",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"ETLLogID": {
+				"type": "string",
+				"defaultValue": "-1"
+			},
+			"Area": {
+				"type": "string",
+				"defaultValue": "Sales"
+			}
+		},
+		"variables": {
+			"Throw error": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ETL/Stage/OnPremise"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-02-03T15:22:31Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
