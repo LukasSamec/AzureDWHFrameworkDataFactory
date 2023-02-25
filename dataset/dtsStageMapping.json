@@ -5,6 +5,9 @@
 			"referenceName": "DWH",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "MappingTables"
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
