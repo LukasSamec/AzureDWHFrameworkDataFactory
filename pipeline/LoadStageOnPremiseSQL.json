@@ -384,7 +384,7 @@
 			}
 		},
 		"folder": {
-			"name": "ETL/Stage/OnPremise"
+			"name": "ETL/Stage/OnPremiseSQL"
 		},
 		"annotations": [],
 		"lastPublishTime": "2022-02-03T15:22:31Z"
