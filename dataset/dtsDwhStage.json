@@ -1,5 +1,5 @@
 {
-	"name": "dtsStage",
+	"name": "dtsDwhStage",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "DWH",
