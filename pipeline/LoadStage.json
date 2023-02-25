@@ -1,39 +1,23 @@
 {
-	"name": "Main",
+	"name": "LoadStage",
 	"properties": {
 		"activities": [
 			{
-				"name": "Load Dwh",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "LoadStage",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "LoadDwh",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
-				}
-			},
-			{
-				"name": "LoadStage",
+				"name": "LoadStageOnPremiseSQL",
 				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "LoadStage",
+						"referenceName": "LoadStageOnPremiseSQL",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
 					"parameters": {
+						"ETLLogID": {
+							"value": "@pipeline().parameters.ETLLogID",
+							"type": "Expression"
+						},
 						"Area": {
 							"value": "@pipeline().parameters.Area",
 							"type": "Expression"
@@ -43,9 +27,15 @@
 			}
 		],
 		"parameters": {
+			"ETLLogID": {
+				"type": "string"
+			},
 			"Area": {
 				"type": "string"
 			}
+		},
+		"folder": {
+			"name": "ETL/Stage"
 		},
 		"annotations": []
 	}
