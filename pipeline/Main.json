@@ -148,7 +148,8 @@
 		],
 		"parameters": {
 			"Area": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "All"
 			}
 		},
 		"variables": {
