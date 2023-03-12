@@ -655,7 +655,7 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
-											"sqlReaderStoredProcedureName": "[[etl].[p_WriteETLTableLoadLog]",
+											"sqlReaderStoredProcedureName": "[[log].[p_WriteETLTableLoadLog]",
 											"storedProcedureParameters": {
 												"ETLLogID": {
 													"type": "Int32",
@@ -671,16 +671,9 @@
 														"type": "Expression"
 													}
 												},
-												"NewTableLoadLog_SK": {
+												"NewTableLoadLogID": {
 													"type": "Int32",
 													"value": null
-												},
-												"StartTime": {
-													"type": "DateTime",
-													"value": {
-														"value": "@getFutureTime(2, 'Hour')",
-														"type": "Expression"
-													}
 												},
 												"Status": {
 													"type": "Int32",
@@ -1831,7 +1824,7 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
-											"sqlReaderStoredProcedureName": "[[etl].[p_WriteETLTableLoadLog]",
+											"sqlReaderStoredProcedureName": "[[log].[p_WriteETLTableLoadLog]",
 											"storedProcedureParameters": {
 												"ETLLogID": {
 													"type": "Int32",
@@ -1847,16 +1840,9 @@
 														"type": "Expression"
 													}
 												},
-												"NewTableLoadLog_SK": {
+												"NewTableLoadLogID": {
 													"type": "Int32",
 													"value": null
-												},
-												"StartTime": {
-													"type": "DateTime",
-													"value": {
-														"value": "@getFutureTime(2, 'Hour')",
-														"type": "Expression"
-													}
 												},
 												"Status": {
 													"type": "Int32",
