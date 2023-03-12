@@ -1,5 +1,5 @@
 {
-	"name": "CSVFile",
+	"name": "dtsCSVFile",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "CSVSource",
