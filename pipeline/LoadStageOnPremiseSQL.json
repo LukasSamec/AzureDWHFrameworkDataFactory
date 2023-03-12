@@ -173,7 +173,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderStoredProcedureName": "[etl].[p_WriteETLTableLoadLog]",
+									"sqlReaderStoredProcedureName": "[log].[p_WriteETLTableLoadLog]",
 									"storedProcedureParameters": {
 										"ETLLogID": {
 											"type": "Int32",
