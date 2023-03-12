@@ -1,5 +1,5 @@
 {
-	"name": "LoadStageOnPremiseSQL",
+	"name": "LoadStageCSV",
 	"properties": {
 		"activities": [
 			{
@@ -28,7 +28,7 @@
 							},
 							"SourceDataset": {
 								"type": "String",
-								"value": "dtsOnPremiseSQL"
+								"value": "dtsCSVFile"
 							}
 						},
 						"queryTimeout": "02:00:00",
@@ -81,7 +81,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "SqlServerSource",
+									"type": "DelimitedTextSource",
 									"additionalColumns": [
 										{
 											"name": "InsertedETLLogID",
@@ -98,12 +98,14 @@
 											}
 										}
 									],
-									"sqlReaderQuery": {
-										"value": "@item().SelectQuery",
-										"type": "Expression"
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
 									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
 								},
 								"sink": {
 									"type": "AzureSqlSink",
@@ -127,14 +129,15 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "dtsOnPremiseSQL",
+									"referenceName": "dtsCSVFile",
 									"type": "DatasetReference",
 									"parameters": {
-										"SchemaName": {
+										"FileSystem": "csvsource",
+										"Directory": {
 											"value": "@item().SourceSchema",
 											"type": "Expression"
 										},
-										"TableName": {
+										"FileName": {
 											"value": "@item().SourceTable",
 											"type": "Expression"
 										}
@@ -388,7 +391,7 @@
 			}
 		},
 		"folder": {
-			"name": "Stage/OnPremiseSQL"
+			"name": "Stage/CSV"
 		},
 		"annotations": [],
 		"lastPublishTime": "2022-02-03T15:22:31Z"

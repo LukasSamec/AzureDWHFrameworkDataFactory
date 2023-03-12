@@ -24,6 +24,29 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "LoadStageCSV",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "LoadStageCSV",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"ETLLogID": {
+							"value": "@pipeline().parameters.ETLLogID",
+							"type": "Expression"
+						},
+						"Area": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						}
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -35,7 +58,7 @@
 			}
 		},
 		"folder": {
-			"name": "ETL/Stage"
+			"name": "Stage"
 		},
 		"annotations": []
 	}
