@@ -189,16 +189,9 @@
 												"type": "Expression"
 											}
 										},
-										"NewTableLoadLog_SK": {
+										"NewTableLoadLogID": {
 											"type": "Int32",
 											"value": null
-										},
-										"StartTime": {
-											"type": "DateTime",
-											"value": {
-												"value": "@getFutureTime(2, 'Hour')",
-												"type": "Expression"
-											}
 										},
 										"Status": {
 											"type": "Int32",
