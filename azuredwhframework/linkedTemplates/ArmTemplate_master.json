@@ -7,9 +7,30 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "azuredwhframework"
 		},
+		"CSVSource_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'CSVSource'"
+		},
 		"DWH_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'DWH'"
+		},
+		"OnPremiseSQLSource_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'OnPremiseSQLSource'",
+			"defaultValue": "Integrated Security=True;Data Source=LAPTOP-NBJCJG95;Initial Catalog=AdventureWorks2019"
+		},
+		"OnPremiseSQLSource_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'OnPremiseSQLSource'"
+		},
+		"CSVSource_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://filesources.dfs.core.windows.net/"
+		},
+		"OnPremiseSQLSource_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "LAPTOP-NBJCJG95\\lukas"
 		},
 		"containerUri": {
 			"type": "string",
@@ -38,8 +59,23 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"CSVSource_accountKey": {
+						"value": "[parameters('CSVSource_accountKey')]"
+					},
 					"DWH_connectionString": {
 						"value": "[parameters('DWH_connectionString')]"
+					},
+					"OnPremiseSQLSource_connectionString": {
+						"value": "[parameters('OnPremiseSQLSource_connectionString')]"
+					},
+					"OnPremiseSQLSource_password": {
+						"value": "[parameters('OnPremiseSQLSource_password')]"
+					},
+					"CSVSource_properties_typeProperties_url": {
+						"value": "[parameters('CSVSource_properties_typeProperties_url')]"
+					},
+					"OnPremiseSQLSource_properties_typeProperties_userName": {
+						"value": "[parameters('OnPremiseSQLSource_properties_typeProperties_userName')]"
 					}
 				}
 			},

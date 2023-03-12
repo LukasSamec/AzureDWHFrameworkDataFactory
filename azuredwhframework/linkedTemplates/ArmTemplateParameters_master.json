@@ -5,8 +5,23 @@
 		"factoryName": {
 			"value": "azuredwhframework"
 		},
+		"CSVSource_accountKey": {
+			"value": ""
+		},
 		"DWH_connectionString": {
 			"value": ""
+		},
+		"OnPremiseSQLSource_connectionString": {
+			"value": "Integrated Security=True;Data Source=LAPTOP-NBJCJG95;Initial Catalog=AdventureWorks2019"
+		},
+		"OnPremiseSQLSource_password": {
+			"value": ""
+		},
+		"CSVSource_properties_typeProperties_url": {
+			"value": "https://filesources.dfs.core.windows.net/"
+		},
+		"OnPremiseSQLSource_properties_typeProperties_userName": {
+			"value": "LAPTOP-NBJCJG95\\lukas"
 		},
 		"containerUri": {
 			"value": ""
