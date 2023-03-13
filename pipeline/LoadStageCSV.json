@@ -119,8 +119,12 @@
 								},
 								"enableStaging": false,
 								"translator": {
-									"value": "@json(activity('GetColumnMapping').output.firstRow.json_output)",
-									"type": "Expression"
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
 								}
 							},
 							"inputs": [
