@@ -65,7 +65,7 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "WriteETLTableLoadLogID",
+									"activity": "GetColumnMapping",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -119,12 +119,8 @@
 								},
 								"enableStaging": false,
 								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
+									"value": "@json(activity('GetColumnMapping').output.firstRow.json_output)",
+									"type": "Expression"
 								}
 							},
 							"inputs": [
@@ -354,6 +350,55 @@
 							"linkedServiceName": {
 								"referenceName": "DWH",
 								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "GetColumnMapping",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "WriteETLTableLoadLogID",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderStoredProcedureName": "[etl].[p_GetColumnMapping]",
+									"storedProcedureParameters": {
+										"SchemaName": {
+											"type": "String",
+											"value": {
+												"value": "@item().TargetSchema",
+												"type": "Expression"
+											}
+										},
+										"TableName": {
+											"type": "String",
+											"value": {
+												"value": "@item().TargetTable",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "dtsStageMapping",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
 							}
 						}
 					]
