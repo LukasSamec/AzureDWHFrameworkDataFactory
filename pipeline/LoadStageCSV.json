@@ -119,8 +119,69 @@
 								},
 								"enableStaging": false,
 								"translator": {
-									"value": "@json(activity('GetColumnMapping').output.firstRow.json_output)",
-									"type": "Expression"
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "AddressID",
+												"type": "String"
+											},
+											"sink": {
+												"name": "AddressID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "AddressLine1",
+												"type": "String"
+											},
+											"sink": {
+												"name": "AddressLine1",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "AddressLine2",
+												"type": "String"
+											},
+											"sink": {
+												"name": "AddressLine2",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "City",
+												"type": "String"
+											},
+											"sink": {
+												"name": "City",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "InsertedETLLogID",
+												"type": "String"
+											},
+											"sink": {
+												"name": "InsertedETLLogID",
+												"type": "Int64"
+											}
+										},
+										{
+											"source": {
+												"name": "UpdatedETLLogID",
+												"type": "String"
+											},
+											"sink": {
+												"name": "UpdatedETLLogID",
+												"type": "Int64"
+											}
+										}
+									]
 								}
 							},
 							"inputs": [
