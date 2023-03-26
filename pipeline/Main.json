@@ -127,7 +127,7 @@
 				}
 			},
 			{
-				"name": "If Condition1",
+				"name": "LogETLStatus",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
