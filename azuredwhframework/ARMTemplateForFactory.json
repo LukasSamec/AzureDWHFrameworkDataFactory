@@ -1780,19 +1780,19 @@
 				"parameters": {
 					"TenantID": {
 						"type": "String",
-						"defaultValue": "4bc7a09f-f452-4270-af2b-850247a5e884"
+						"defaultValue": "6e0a5f83-1728-4956-bdf4-ce37760cd214"
 					},
 					"SubscriptionID": {
 						"type": "String",
-						"defaultValue": "127e52ed-136d-461b-aadd-0aba0a83f69b"
+						"defaultValue": "c87e9a49-c82c-4d59-ba82-f4a80d29bb92"
 					},
 					"Region": {
 						"type": "String",
-						"defaultValue": "northeurope"
+						"defaultValue": "westeurope"
 					},
 					"Server": {
 						"type": "String",
-						"defaultValue": "prodasaladin"
+						"defaultValue": "azuredwhframework"
 					},
 					"DatabaseName": {
 						"type": "String",
