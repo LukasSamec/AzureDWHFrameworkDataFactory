@@ -1165,7 +1165,7 @@
 												"ETLLogID": {
 													"type": "Int32",
 													"value": {
-														"value": "@int(pipeline().parameters.ETLLogID)",
+														"value": "@pipeline().parameters.ETLLogID",
 														"type": "Expression"
 													}
 												},
@@ -1384,66 +1384,6 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Load DWH",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "LoadStage",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "LoadDwh",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"ETLLogID": {
-									"value": "@pipeline().parameters.Area",
-									"type": "Expression"
-								},
-								"Area": {
-									"value": "@pipeline().parameters.Area",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "LoadStage",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "AssignETLLogIDToVariable",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "LoadStage",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"ETLLogID": {
-									"value": "@variables('ETLLogID')",
-									"type": "Expression"
-								},
-								"Area": {
-									"value": "@pipeline().parameters.Area",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
 						"name": "WriteETLLog",
 						"type": "Lookup",
 						"dependsOn": [],
@@ -1528,34 +1468,13 @@
 						}
 					},
 					{
-						"name": "ProcessAnalyticalDatabases",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Load DWH",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "ProcessModels",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
 						"name": "GetETLStatus",
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "ProcessAnalyticalDatabases",
+								"activity": "LoadAll",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -1591,7 +1510,7 @@
 						}
 					},
 					{
-						"name": "If Condition1",
+						"name": "LogETLStatus",
 						"type": "IfCondition",
 						"dependsOn": [
 							{
@@ -1686,6 +1605,36 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "LoadAll",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "AssignETLLogIDToVariable",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LoadAll",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"ETLLogID": {
+									"value": "@variables('ETLLogID')",
+									"type": "Expression"
+								},
+								"Area": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								}
+							}
+						}
 					}
 				],
 				"policy": {
@@ -1706,11 +1655,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/LoadDwh')]",
-				"[concat(variables('factoryId'), '/pipelines/LoadStage')]",
 				"[concat(variables('factoryId'), '/datasets/dtsStageMapping')]",
-				"[concat(variables('factoryId'), '/pipelines/ProcessModels')]",
 				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
+				"[concat(variables('factoryId'), '/pipelines/LoadAll')]",
 				"[concat(variables('factoryId'), '/linkedServices/DWH')]"
 			]
 		},
@@ -2441,6 +2388,7 @@
 								"value": "@activity('GetModels').output.value",
 								"type": "Expression"
 							},
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "ProcessModel",
@@ -2456,6 +2404,10 @@
 										"parameters": {
 											"DatabaseName": {
 												"value": "@item().TabularModel",
+												"type": "Expression"
+											},
+											"ETLLogID": {
+												"value": "@pipeline().parameters.ETLLogID",
 												"type": "Expression"
 											}
 										}
@@ -2508,6 +2460,9 @@
 				"parameters": {
 					"Area": {
 						"type": "string"
+					},
+					"ETLLogID": {
+						"type": "string"
 					}
 				},
 				"folder": {
@@ -2518,6 +2473,116 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
 				"[concat(variables('factoryId'), '/pipelines/ProcessModel')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LoadAll')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Load DWH",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "LoadStage",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LoadDwh",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"ETLLogID": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								},
+								"Area": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "LoadStage",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LoadStage",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"ETLLogID": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								},
+								"Area": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "ProcessAnalyticalDatabases",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load DWH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ProcessModels",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Area": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								},
+								"ETLLogID": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"ETLLogID": {
+						"type": "string"
+					},
+					"Area": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/LoadDwh')]",
+				"[concat(variables('factoryId'), '/pipelines/LoadStage')]",
+				"[concat(variables('factoryId'), '/pipelines/ProcessModels')]"
 			]
 		}
 	]
