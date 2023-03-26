@@ -380,7 +380,10 @@
 										"type": "Int32"
 									},
 									"ErrorMessage": {
-										"value": null,
+										"value": {
+											"value": "@activity('Load Stage Table').Error.Message",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"ETLTableLoadLogID": {
