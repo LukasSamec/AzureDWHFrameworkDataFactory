@@ -933,7 +933,10 @@
 												"type": "Int32"
 											},
 											"ErrorMessage": {
-												"value": null,
+												"value": {
+													"value": "@activity('Load Stage Table').Error.Message",
+													"type": "Expression"
+												},
 												"type": "String"
 											},
 											"ETLTableLoadLogID": {
@@ -1941,7 +1944,10 @@
 												"type": "Int32"
 											},
 											"ErrorMessage": {
-												"value": null,
+												"value": {
+													"value": "@activity('Load Stage Table').Error.Message",
+													"type": "Expression"
+												},
 												"type": "String"
 											},
 											"ETLTableLoadLogID": {
@@ -1960,7 +1966,7 @@
 												"type": "Int32"
 											},
 											"StatusDescription": {
-												"value": "Error",
+												"value": "Failed",
 												"type": "String"
 											},
 											"Updated": {
