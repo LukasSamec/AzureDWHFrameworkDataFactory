@@ -7,7 +7,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "LoadStage",
+						"activity": "GetSuccessfulStageAreas",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -26,7 +26,7 @@
 							"type": "Expression"
 						},
 						"Area": {
-							"value": "@pipeline().parameters.Area",
+							"value": "@string(activity('GetSuccessfulStageAreas').output.firstRow.Area)",
 							"type": "Expression"
 						}
 					}
@@ -60,7 +60,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Load DWH",
+						"activity": "GetSuccessfulDWHAreas",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -75,13 +75,103 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Area": {
-							"value": "@pipeline().parameters.Area",
+							"value": "@string(activity('GetSuccessfulDWHAreas').output.firstRow.Area)",
 							"type": "Expression"
 						},
 						"ETLLogID": {
 							"value": "@pipeline().parameters.ETLLogID",
 							"type": "Expression"
 						}
+					}
+				}
+			},
+			{
+				"name": "GetSuccessfulStageAreas",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LoadStage",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[etl].[p_GetSuccessfulAreaList]",
+						"storedProcedureParameters": {
+							"ETLLogID": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								}
+							},
+							"LoadType": {
+								"type": "String",
+								"value": "Copy Data"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dtsDwhMapping",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "GetSuccessfulDWHAreas",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Load DWH",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[etl].[p_GetSuccessfulAreaList]",
+						"storedProcedureParameters": {
+							"ETLLogID": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								}
+							},
+							"LoadType": {
+								"type": "String",
+								"value": "Copy Data"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dtsDwhMapping",
+						"type": "DatasetReference"
 					}
 				}
 			}
