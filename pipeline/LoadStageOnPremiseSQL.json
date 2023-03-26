@@ -178,7 +178,7 @@
 										"ETLLogID": {
 											"type": "Int32",
 											"value": {
-												"value": "@int(pipeline().parameters.ETLLogID)",
+												"value": "@pipeline().parameters.ETLLogID",
 												"type": "Expression"
 											}
 										},
