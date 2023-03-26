@@ -22,7 +22,7 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"ETLLogID": {
-							"value": "@pipeline().parameters.Area",
+							"value": "@pipeline().parameters.ETLLogID",
 							"type": "Expression"
 						},
 						"Area": {
@@ -45,7 +45,7 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"ETLLogID": {
-							"value": "@pipeline().parameters.Area",
+							"value": "@pipeline().parameters.ETLLogID",
 							"type": "Expression"
 						},
 						"Area": {
@@ -76,6 +76,10 @@
 					"parameters": {
 						"Area": {
 							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						},
+						"ETLLogID": {
+							"value": "@pipeline().parameters.ETLLogID",
 							"type": "Expression"
 						}
 					}

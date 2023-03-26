@@ -19,6 +19,7 @@
 						"value": "@activity('GetModels').output.value",
 						"type": "Expression"
 					},
+					"isSequential": false,
 					"activities": [
 						{
 							"name": "ProcessModel",
@@ -34,6 +35,10 @@
 								"parameters": {
 									"DatabaseName": {
 										"value": "@item().TabularModel",
+										"type": "Expression"
+									},
+									"ETLLogID": {
+										"value": "@pipeline().parameters.ETLLogID",
 										"type": "Expression"
 									}
 								}
@@ -80,6 +85,9 @@
 		],
 		"parameters": {
 			"Area": {
+				"type": "string"
+			},
+			"ETLLogID": {
 				"type": "string"
 			}
 		},
