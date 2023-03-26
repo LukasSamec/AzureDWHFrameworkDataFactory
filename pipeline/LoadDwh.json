@@ -75,6 +75,10 @@
 									"Area": {
 										"value": "@pipeline().parameters.Area",
 										"type": "Expression"
+									},
+									"ETLLogID": {
+										"value": "@pipeline().parameters.ETLLogID",
+										"type": "Expression"
 									}
 								}
 							}
