@@ -45,7 +45,7 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"ETLLogID": {
-							"value": "@variables('ETLLogID')",
+							"value": "@pipeline().parameters.Area",
 							"type": "Expression"
 						},
 						"Area": {
@@ -72,7 +72,13 @@
 						"referenceName": "ProcessModels",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"Area": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],
