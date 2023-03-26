@@ -115,10 +115,6 @@
 									"value": "@pipeline().parameters.ETLLogID",
 									"type": "Expression"
 								}
-							},
-							"LoadType": {
-								"type": "String",
-								"value": "Copy Data"
 							}
 						},
 						"queryTimeout": "02:00:00",
@@ -160,10 +156,6 @@
 									"value": "@pipeline().parameters.ETLLogID",
 									"type": "Expression"
 								}
-							},
-							"LoadType": {
-								"type": "String",
-								"value": "Stored procedure"
 							}
 						},
 						"queryTimeout": "02:00:00",
