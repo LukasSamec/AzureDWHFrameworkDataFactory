@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Load Dwh",
+				"name": "Load DWH",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -143,6 +143,26 @@
 						"value": "@string(activity('WriteETLLog').output.firstRow.SCOPE_IDENTITY)",
 						"type": "Expression"
 					}
+				}
+			},
+			{
+				"name": "ProcessAnalyticalDatabases",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load DWH",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ProcessModels",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
 				}
 			}
 		],

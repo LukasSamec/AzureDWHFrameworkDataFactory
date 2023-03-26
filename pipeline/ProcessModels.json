@@ -1,0 +1,91 @@
+{
+	"name": "ProcessModels",
+	"properties": {
+		"activities": [
+			{
+				"name": "ProcessTabularModels",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetModels",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetModels').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "ProcessModel",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "ProcessModel",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"DatabaseName": {
+										"value": "@item().TabularModel",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "GetModels",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[etl].[p_GetTabularModels]",
+						"storedProcedureParameters": {
+							"Area": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dtsDwhMapping",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"parameters": {
+			"Area": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Azure AS"
+		},
+		"annotations": []
+	}
+}

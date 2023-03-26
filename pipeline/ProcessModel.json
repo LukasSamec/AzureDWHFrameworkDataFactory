@@ -211,7 +211,7 @@
 			},
 			"DatabaseName": {
 				"type": "String",
-				"defaultValue": "Aladin_SSAS_Sales"
+				"defaultValue": "AAS_Sales"
 			}
 		},
 		"folder": {
