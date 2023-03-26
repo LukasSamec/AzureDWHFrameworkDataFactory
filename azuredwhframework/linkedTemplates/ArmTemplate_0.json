@@ -260,7 +260,7 @@
 					},
 					"DatabaseName": {
 						"type": "String",
-						"defaultValue": "Aladin_SSAS_Sales"
+						"defaultValue": "AAS_Sales"
 					}
 				},
 				"folder": {
@@ -1325,6 +1325,108 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ProcessModels')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ProcessTabularModels",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetModels",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetModels').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "ProcessModel",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "ProcessModel",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"DatabaseName": {
+												"value": "@item().TabularModel",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GetModels",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[etl].[p_GetTabularModels]",
+								"storedProcedureParameters": {
+									"Area": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.Area",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dtsDwhMapping",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Area": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Azure AS"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
+				"[concat(variables('factoryId'), '/pipelines/ProcessModel')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LoadDwh')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1920,7 +2022,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Load Dwh",
+						"name": "Load DWH",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
@@ -2062,6 +2164,27 @@
 								"type": "Expression"
 							}
 						}
+					},
+					{
+						"name": "ProcessAnalyticalDatabases",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load DWH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ProcessModels",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -2084,7 +2207,8 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/LoadDwh')]",
 				"[concat(variables('factoryId'), '/pipelines/LoadStage')]",
-				"[concat(variables('factoryId'), '/datasets/dtsStageMapping')]"
+				"[concat(variables('factoryId'), '/datasets/dtsStageMapping')]",
+				"[concat(variables('factoryId'), '/pipelines/ProcessModels')]"
 			]
 		}
 	]
