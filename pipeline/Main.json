@@ -145,7 +145,7 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "Stored procedure1_copy1",
+							"name": "LogError",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
@@ -171,7 +171,7 @@
 										"type": "Int32"
 									},
 									"StatusDescription": {
-										"value": "Error",
+										"value": "Failed",
 										"type": "String"
 									}
 								}
@@ -184,7 +184,7 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "Stored procedure1",
+							"name": "LogSuccess",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
