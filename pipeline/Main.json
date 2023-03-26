@@ -157,7 +157,7 @@
 				}
 			},
 			{
-				"name": "Switch1",
+				"name": "LogETLStatus",
 				"type": "Switch",
 				"dependsOn": [
 					{
