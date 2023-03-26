@@ -1,0 +1,89 @@
+{
+	"name": "LoadAll",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load DWH",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "LoadStage",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "LoadDwh",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"ETLLogID": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						},
+						"Area": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "LoadStage",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "LoadStage",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"ETLLogID": {
+							"value": "@variables('ETLLogID')",
+							"type": "Expression"
+						},
+						"Area": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "ProcessAnalyticalDatabases",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load DWH",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ProcessModels",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"parameters": {
+			"ETLLogID": {
+				"type": "string"
+			},
+			"Area": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}

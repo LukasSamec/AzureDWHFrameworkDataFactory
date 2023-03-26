@@ -3,66 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Load DWH",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "LoadStage",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "LoadDwh",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"ETLLogID": {
-							"value": "@pipeline().parameters.Area",
-							"type": "Expression"
-						},
-						"Area": {
-							"value": "@pipeline().parameters.Area",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			{
-				"name": "LoadStage",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "AssignETLLogIDToVariable",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "LoadStage",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"ETLLogID": {
-							"value": "@variables('ETLLogID')",
-							"type": "Expression"
-						},
-						"Area": {
-							"value": "@pipeline().parameters.Area",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			{
 				"name": "WriteETLLog",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -146,33 +86,13 @@
 				}
 			},
 			{
-				"name": "ProcessAnalyticalDatabases",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Load DWH",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "ProcessModels",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
-				}
-			},
-			{
 				"name": "GetETLStatus",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ProcessAnalyticalDatabases",
+						"activity": "LoadAll",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -301,6 +221,36 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "LoadAll",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "AssignETLLogIDToVariable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "LoadAll",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"ETLLogID": {
+							"value": "@variables('ETLLogID')",
+							"type": "Expression"
+						},
+						"Area": {
+							"value": "@pipeline().parameters.Area",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],
