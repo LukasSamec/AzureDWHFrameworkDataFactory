@@ -246,7 +246,7 @@
 												"type": "Int32"
 											},
 											"StatusDescription": {
-												"value": "Success",
+												"value": "Finished",
 												"type": "String"
 											}
 										}
