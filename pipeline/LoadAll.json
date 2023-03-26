@@ -163,7 +163,7 @@
 							},
 							"LoadType": {
 								"type": "String",
-								"value": "Copy Data"
+								"value": "Stored procedure"
 							}
 						},
 						"queryTimeout": "02:00:00",
