@@ -339,7 +339,7 @@
 										"type": "Int32"
 									},
 									"StatusDescription": {
-										"value": "Error",
+										"value": "Failed",
 										"type": "String"
 									},
 									"Updated": {
