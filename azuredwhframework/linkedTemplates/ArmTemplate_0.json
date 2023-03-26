@@ -2451,7 +2451,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@equals(activity('GetETLStatus').output.firstRow.logStatus, 1)",
+								"value": "@equals(activity('GetETLStatus').output.firstRow.logStatus, False)",
 								"type": "Expression"
 							},
 							"ifFalseActivities": [
