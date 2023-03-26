@@ -82,7 +82,7 @@
 							"PipelineName": {
 								"type": "String",
 								"value": {
-									"value": "@pipeline().DataFactory",
+									"value": "@pipeline().Pipeline",
 									"type": "Expression"
 								}
 							},
