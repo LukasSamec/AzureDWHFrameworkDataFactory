@@ -189,7 +189,7 @@
 												"type": "Expression"
 											}
 										},
-										"NewTableLoadLogID": {
+										"NewETLTableLoadLogID": {
 											"type": "Int32",
 											"value": null
 										},
