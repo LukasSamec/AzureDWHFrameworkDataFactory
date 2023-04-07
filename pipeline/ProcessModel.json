@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "UntilRefreshComplete",
+				"description": "Opakování kontrolování stavu processování. Opakování se provádí dokud stav je jiný než inProgress.",
 				"type": "Until",
 				"dependsOn": [
 					{
@@ -65,6 +66,7 @@
 			},
 			{
 				"name": "StartProcessingAzureAS",
+				"description": "Spuštění procesování analytické databáze.",
 				"type": "WebActivity",
 				"dependsOn": [
 					{
@@ -230,6 +232,7 @@
 			},
 			{
 				"name": "GetAzureASRefreshes",
+				"description": "Získání seznamu procesování analytické databáze.",
 				"type": "WebActivity",
 				"dependsOn": [
 					{
@@ -266,6 +269,7 @@
 			},
 			{
 				"name": "FilterToCurrentRefresh",
+				"description": "Zafiltrování seznamu na poslední (aktuální) procesování.",
 				"type": "Filter",
 				"dependsOn": [
 					{
@@ -289,6 +293,7 @@
 			},
 			{
 				"name": "WriteETLTableLoadLogID",
+				"description": "Zalogování processování analytické databáze.",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
