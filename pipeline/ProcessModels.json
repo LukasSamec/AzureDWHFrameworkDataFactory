@@ -87,10 +87,12 @@
 		],
 		"parameters": {
 			"Area": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "All"
 			},
 			"ETLLogID": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "1"
 			}
 		},
 		"folder": {

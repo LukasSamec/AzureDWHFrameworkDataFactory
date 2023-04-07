@@ -472,11 +472,11 @@
 		"parameters": {
 			"ETLLogID": {
 				"type": "string",
-				"defaultValue": "-1"
+				"defaultValue": "1"
 			},
 			"Area": {
 				"type": "string",
-				"defaultValue": "Sales"
+				"defaultValue": "All"
 			}
 		},
 		"variables": {

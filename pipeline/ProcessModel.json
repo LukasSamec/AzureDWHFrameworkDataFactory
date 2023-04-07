@@ -376,7 +376,8 @@
 				"defaultValue": "AAS_Sales"
 			},
 			"ETLLogID": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "1"
 			}
 		},
 		"folder": {

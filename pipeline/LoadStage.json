@@ -51,10 +51,12 @@
 		],
 		"parameters": {
 			"ETLLogID": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "1"
 			},
 			"Area": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "All"
 			}
 		},
 		"folder": {
