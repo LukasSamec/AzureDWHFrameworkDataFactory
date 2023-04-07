@@ -247,6 +247,7 @@
 				"activities": [
 					{
 						"name": "GetLayers",
+						"description": "Získání seřazeného seznamu hodnot Layer pro dané businessové oblasti.",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -283,6 +284,7 @@
 					},
 					{
 						"name": "LoadDwhLayers",
+						"description": "Spuštění uložených procedur pro načítání dimenzionálních a faktových tabulek pro dané businessové oblasti a danou layer.",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -371,6 +373,7 @@
 				"activities": [
 					{
 						"name": "Get Dimension Tables",
+						"description": "Získání seznamu procedur pro načítání dimenzionálních tabulek pro dané businessové oblasti a danou layer.",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -418,6 +421,7 @@
 					},
 					{
 						"name": "Load Dimension Tables",
+						"description": "Spuštění uložených procedur vrácených lookup aktivitou.",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -472,6 +476,7 @@
 					},
 					{
 						"name": "Get Fact Tables",
+						"description": "Získání seznamu procedur pro načítání faktových tabulek pro dané businessové oblasti a danou layer.",
 						"type": "Lookup",
 						"dependsOn": [
 							{
@@ -526,6 +531,7 @@
 					},
 					{
 						"name": "Load Fact Tables",
+						"description": "Spuštění uložených procedur vrácených lookup aktivitou.",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -1896,6 +1902,7 @@
 				"activities": [
 					{
 						"name": "UntilRefreshComplete",
+						"description": "Opakování kontrolování stavu procesování. Opakování se provádí dokud stav procesování je jiný než inProgress.",
 						"type": "Until",
 						"dependsOn": [
 							{
@@ -1958,6 +1965,7 @@
 					},
 					{
 						"name": "StartProcessingAzureAS",
+						"description": "Spuštění procesování analytické databáze.",
 						"type": "WebActivity",
 						"dependsOn": [
 							{
@@ -1995,6 +2003,7 @@
 					},
 					{
 						"name": "IfFailed",
+						"description": "Zalogování úspěchu nebo chyby procesování na základě stavu posledního procesování.",
 						"type": "IfCondition",
 						"dependsOn": [
 							{
@@ -2124,6 +2133,7 @@
 					},
 					{
 						"name": "GetAzureASRefreshes",
+						"description": "Získání seznamu procesování analytické databáze.",
 						"type": "WebActivity",
 						"dependsOn": [
 							{
@@ -2161,6 +2171,7 @@
 					},
 					{
 						"name": "FilterToCurrentRefresh",
+						"description": "Zafiltrování seznamu na poslední (aktuální) procesování.",
 						"type": "Filter",
 						"dependsOn": [
 							{
@@ -2184,6 +2195,7 @@
 					},
 					{
 						"name": "WriteETLTableLoadLogID",
+						"description": "Zalogování processování analytické databáze.",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
