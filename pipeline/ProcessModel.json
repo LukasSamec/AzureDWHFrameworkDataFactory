@@ -4,7 +4,7 @@
 		"activities": [
 			{
 				"name": "UntilRefreshComplete",
-				"description": "Opakování kontrolování stavu processování. Opakování se provádí dokud stav je jiný než inProgress.",
+				"description": "Opakování kontrolování stavu procesování. Opakování se provádí dokud stav procesování je jiný než inProgress.",
 				"type": "Until",
 				"dependsOn": [
 					{
@@ -103,6 +103,7 @@
 			},
 			{
 				"name": "IfFailed",
+				"description": "Zalogování úspěchu nebo chyby procesování na základě stavu posledního procesování.",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
