@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "WriteETLLog",
+				"description": "Zalogování nového běhu ETL.",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -67,6 +68,7 @@
 			},
 			{
 				"name": "AssignETLLogIDToVariable",
+				"description": "Uložení nové hodnoty ETLLogID do proměnné ETLLogID",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -87,6 +89,7 @@
 			},
 			{
 				"name": "GetETLStatus",
+				"description": "Zjištění, zda během načítání tabulek nenastala chyba.",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -128,6 +131,7 @@
 			},
 			{
 				"name": "LoadAll",
+				"description": "Spuštění načítání stage tabulek, dimenzionálních a faktových tabulek a procesování analytických databází.",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -158,6 +162,7 @@
 			},
 			{
 				"name": "LogETLStatus",
+				"description": "Změna stavu logu na úspěšný nebo chybový stav.",
 				"type": "Switch",
 				"dependsOn": [
 					{
