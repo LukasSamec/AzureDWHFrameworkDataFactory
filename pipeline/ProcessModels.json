@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "ProcessTabularModels",
+				"description": "Spuštění processování každé analytické databáze, kterou Lookup aktivita GetModels vrátí.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -49,6 +50,7 @@
 			},
 			{
 				"name": "GetModels",
+				"description": "Získání seznamu analytických databází pro dané businessové oblasti.",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
