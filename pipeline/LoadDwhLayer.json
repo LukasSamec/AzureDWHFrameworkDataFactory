@@ -5,6 +5,7 @@
 		"activities": [
 			{
 				"name": "Get Dimension Tables",
+				"description": "Získání seznamu procedur pro načítání dimenzionálních tabulek pro dané businessové oblasti a danou layer.",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -51,6 +52,7 @@
 			},
 			{
 				"name": "Load Dimension Tables",
+				"description": "Spuštění uložených procedur vrácených lookup aktivitou.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -105,6 +107,7 @@
 			},
 			{
 				"name": "Get Fact Tables",
+				"description": "Získání seznamu procedur pro načítání faktových tabulek pro dané businessové oblasti a danou layer.",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -158,6 +161,7 @@
 			},
 			{
 				"name": "Load Fact Tables",
+				"description": "Spuštění uložených procedur vrácených lookup aktivitou.",
 				"type": "ForEach",
 				"dependsOn": [
 					{

@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "GetLayers",
+				"description": "Získání seřazeného seznamu hodnot Layer pro dané businessové oblasti.",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -39,6 +40,7 @@
 			},
 			{
 				"name": "LoadDwhLayers",
+				"description": "Spuštění uložených procedur pro načítání dimenzionálních a faktových tabulek pro dané businessové oblasti a danou layer.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
