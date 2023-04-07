@@ -38,6 +38,208 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/LoadAll')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Load DWH",
+						"description": "Načítání dimenzionálních a faktových tabulek.",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "GetSuccessfulStageAreas",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LoadDwh",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"ETLLogID": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								},
+								"Area": {
+									"value": "@string(activity('GetSuccessfulStageAreas').output.firstRow.Area)",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "LoadStage",
+						"description": "Načítání stage tabulek.",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LoadStage",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"ETLLogID": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								},
+								"Area": {
+									"value": "@pipeline().parameters.Area",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "ProcessAnalyticalDatabases",
+						"description": "Procesování analytických databází.",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "GetSuccessfulDWHAreas",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ProcessModels",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Area": {
+									"value": "@string(activity('GetSuccessfulDWHAreas').output.firstRow.Area)",
+									"type": "Expression"
+								},
+								"ETLLogID": {
+									"value": "@pipeline().parameters.ETLLogID",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "GetSuccessfulStageAreas",
+						"description": "Získání seznamu businessových oblastí, pro které nenastala chyba během načítání stage vrstvy.",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "LoadStage",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[etl].[p_GetSuccessfulAreaList]",
+								"storedProcedureParameters": {
+									"ETLLogID": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.ETLLogID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dtsDwhMapping",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "GetSuccessfulDWHAreas",
+						"description": "Získání seznamu businessových oblastí, pro které nenastala chyba během načítání dwh vrstvy.",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Load DWH",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[etl].[p_GetSuccessfulAreaList]",
+								"storedProcedureParameters": {
+									"ETLLogID": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.ETLLogID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dtsDwhMapping",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"ETLLogID": {
+						"type": "string",
+						"defaultValue": "1"
+					},
+					"Area": {
+						"type": "string",
+						"defaultValue": "All"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/LoadDwh')]",
+				"[concat(variables('factoryId'), '/pipelines/LoadStage')]",
+				"[concat(variables('factoryId'), '/pipelines/ProcessModels')]",
+				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LoadDwh')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -136,11 +338,11 @@
 				"parameters": {
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					}
 				},
 				"variables": {
@@ -388,11 +590,11 @@
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					},
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					}
 				},
 				"folder": {
@@ -465,10 +667,12 @@
 				},
 				"parameters": {
 					"ETLLogID": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "1"
 					},
 					"Area": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "All"
 					}
 				},
 				"folder": {
@@ -964,11 +1168,11 @@
 				"parameters": {
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					}
 				},
 				"variables": {
@@ -1362,11 +1566,11 @@
 				"parameters": {
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					}
 				},
 				"variables": {
@@ -1395,6 +1599,7 @@
 				"activities": [
 					{
 						"name": "WriteETLLog",
+						"description": "Zalogování nového běhu ETL.",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -1459,6 +1664,7 @@
 					},
 					{
 						"name": "AssignETLLogIDToVariable",
+						"description": "Uložení nové hodnoty ETLLogID do proměnné ETLLogID",
 						"type": "SetVariable",
 						"dependsOn": [
 							{
@@ -1479,6 +1685,7 @@
 					},
 					{
 						"name": "GetETLStatus",
+						"description": "Zjištění, zda během načítání tabulek nenastala chyba.",
 						"type": "Lookup",
 						"dependsOn": [
 							{
@@ -1521,6 +1728,7 @@
 					},
 					{
 						"name": "LoadAll",
+						"description": "Spuštění načítání stage tabulek, dimenzionálních a faktových tabulek a procesování analytických databází.",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
@@ -1551,6 +1759,7 @@
 					},
 					{
 						"name": "LogETLStatus",
+						"description": "Změna stavu logu na úspěšný nebo chybový stav.",
 						"type": "Switch",
 						"dependsOn": [
 							{
@@ -2067,7 +2276,8 @@
 						"defaultValue": "AAS_Sales"
 					},
 					"ETLLogID": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "1"
 					}
 				},
 				"folder": {
@@ -2079,6 +2289,120 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/dtsStageMapping')]",
 				"[concat(variables('factoryId'), '/linkedServices/DWH')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProcessModels')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ProcessTabularModels",
+						"description": "Spuštění processování každé analytické databáze, kterou Lookup aktivita GetModels vrátí.",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetModels",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetModels').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "ProcessModel",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "ProcessModel",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"DatabaseName": {
+												"value": "@item().TabularModel",
+												"type": "Expression"
+											},
+											"ETLLogID": {
+												"value": "@pipeline().parameters.ETLLogID",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GetModels",
+						"description": "Získání seznamu analytických databází pro dané businessové oblasti.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[etl].[p_GetTabularModels]",
+								"storedProcedureParameters": {
+									"Area": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.Area",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dtsDwhMapping",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Area": {
+						"type": "string",
+						"defaultValue": "All"
+					},
+					"ETLLogID": {
+						"type": "string",
+						"defaultValue": "1"
+					}
+				},
+				"folder": {
+					"name": "Azure AS"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
+				"[concat(variables('factoryId'), '/pipelines/ProcessModel')]"
 			]
 		},
 		{
@@ -2382,319 +2706,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ProcessModels')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ProcessTabularModels",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GetModels",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GetModels').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "ProcessModel",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "ProcessModel",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"DatabaseName": {
-												"value": "@item().TabularModel",
-												"type": "Expression"
-											},
-											"ETLLogID": {
-												"value": "@pipeline().parameters.ETLLogID",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "GetModels",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[etl].[p_GetTabularModels]",
-								"storedProcedureParameters": {
-									"Area": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.Area",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dtsDwhMapping",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"Area": {
-						"type": "string"
-					},
-					"ETLLogID": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "Azure AS"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]",
-				"[concat(variables('factoryId'), '/pipelines/ProcessModel')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LoadAll')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Load DWH",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "GetSuccessfulStageAreas",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "LoadDwh",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"ETLLogID": {
-									"value": "@pipeline().parameters.ETLLogID",
-									"type": "Expression"
-								},
-								"Area": {
-									"value": "@string(activity('GetSuccessfulStageAreas').output.firstRow.Area)",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "LoadStage",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "LoadStage",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"ETLLogID": {
-									"value": "@pipeline().parameters.ETLLogID",
-									"type": "Expression"
-								},
-								"Area": {
-									"value": "@pipeline().parameters.Area",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "ProcessAnalyticalDatabases",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "GetSuccessfulDWHAreas",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "ProcessModels",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"Area": {
-									"value": "@string(activity('GetSuccessfulDWHAreas').output.firstRow.Area)",
-									"type": "Expression"
-								},
-								"ETLLogID": {
-									"value": "@pipeline().parameters.ETLLogID",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "GetSuccessfulStageAreas",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "LoadStage",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[etl].[p_GetSuccessfulAreaList]",
-								"storedProcedureParameters": {
-									"ETLLogID": {
-										"type": "Int32",
-										"value": {
-											"value": "@pipeline().parameters.ETLLogID",
-											"type": "Expression"
-										}
-									},
-									"LoadType": {
-										"type": "String",
-										"value": "Copy Data"
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dtsDwhMapping",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "GetSuccessfulDWHAreas",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Load DWH",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[etl].[p_GetSuccessfulAreaList]",
-								"storedProcedureParameters": {
-									"ETLLogID": {
-										"type": "Int32",
-										"value": {
-											"value": "@pipeline().parameters.ETLLogID",
-											"type": "Expression"
-										}
-									},
-									"LoadType": {
-										"type": "String",
-										"value": "Stored procedure"
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dtsDwhMapping",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"ETLLogID": {
-						"type": "string"
-					},
-					"Area": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/LoadDwh')]",
-				"[concat(variables('factoryId'), '/pipelines/LoadStage')]",
-				"[concat(variables('factoryId'), '/pipelines/ProcessModels')]",
-				"[concat(variables('factoryId'), '/datasets/dtsDwhMapping')]"
-			]
 		}
 	]
 }

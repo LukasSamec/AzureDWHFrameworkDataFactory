@@ -529,11 +529,11 @@
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					},
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					}
 				},
 				"folder": {
@@ -1030,11 +1030,11 @@
 				"parameters": {
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					}
 				},
 				"variables": {
@@ -1443,7 +1443,8 @@
 						"defaultValue": "AAS_Sales"
 					},
 					"ETLLogID": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "1"
 					}
 				},
 				"folder": {
@@ -1594,11 +1595,11 @@
 				"parameters": {
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					}
 				},
 				"variables": {
@@ -1991,11 +1992,11 @@
 				"parameters": {
 					"ETLLogID": {
 						"type": "string",
-						"defaultValue": "-1"
+						"defaultValue": "1"
 					},
 					"Area": {
 						"type": "string",
-						"defaultValue": "Sales"
+						"defaultValue": "All"
 					}
 				},
 				"variables": {
@@ -2024,6 +2025,7 @@
 				"activities": [
 					{
 						"name": "ProcessTabularModels",
+						"description": "Spuštění processování každé analytické databáze, kterou Lookup aktivita GetModels vrátí.",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -2069,6 +2071,7 @@
 					},
 					{
 						"name": "GetModels",
+						"description": "Získání seznamu analytických databází pro dané businessové oblasti.",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -2110,10 +2113,12 @@
 				},
 				"parameters": {
 					"Area": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "All"
 					},
 					"ETLLogID": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "1"
 					}
 				},
 				"folder": {
@@ -2185,10 +2190,12 @@
 				},
 				"parameters": {
 					"ETLLogID": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "1"
 					},
 					"Area": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "All"
 					}
 				},
 				"folder": {
@@ -2209,6 +2216,7 @@
 				"activities": [
 					{
 						"name": "Load DWH",
+						"description": "Načítání dimenzionálních a faktových tabulek.",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
@@ -2239,6 +2247,7 @@
 					},
 					{
 						"name": "LoadStage",
+						"description": "Načítání stage tabulek.",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
 						"userProperties": [],
@@ -2262,6 +2271,7 @@
 					},
 					{
 						"name": "ProcessAnalyticalDatabases",
+						"description": "Procesování analytických databází.",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
@@ -2292,6 +2302,7 @@
 					},
 					{
 						"name": "GetSuccessfulStageAreas",
+						"description": "Získání seznamu businessových oblastí, pro které nenastala chyba během načítání stage vrstvy.",
 						"type": "Lookup",
 						"dependsOn": [
 							{
@@ -2320,10 +2331,6 @@
 											"value": "@pipeline().parameters.ETLLogID",
 											"type": "Expression"
 										}
-									},
-									"LoadType": {
-										"type": "String",
-										"value": "Copy Data"
 									}
 								},
 								"queryTimeout": "02:00:00",
@@ -2338,6 +2345,7 @@
 					},
 					{
 						"name": "GetSuccessfulDWHAreas",
+						"description": "Získání seznamu businessových oblastí, pro které nenastala chyba během načítání dwh vrstvy.",
 						"type": "Lookup",
 						"dependsOn": [
 							{
@@ -2366,10 +2374,6 @@
 											"value": "@pipeline().parameters.ETLLogID",
 											"type": "Expression"
 										}
-									},
-									"LoadType": {
-										"type": "String",
-										"value": "Stored procedure"
 									}
 								},
 								"queryTimeout": "02:00:00",
@@ -2389,10 +2393,12 @@
 				},
 				"parameters": {
 					"ETLLogID": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "1"
 					},
 					"Area": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "All"
 					}
 				},
 				"annotations": []
@@ -2412,6 +2418,7 @@
 				"activities": [
 					{
 						"name": "WriteETLLog",
+						"description": "Zalogování nového běhu ETL.",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -2476,6 +2483,7 @@
 					},
 					{
 						"name": "AssignETLLogIDToVariable",
+						"description": "Uložení nové hodnoty ETLLogID do proměnné ETLLogID",
 						"type": "SetVariable",
 						"dependsOn": [
 							{
@@ -2496,6 +2504,7 @@
 					},
 					{
 						"name": "GetETLStatus",
+						"description": "Zjištění, zda během načítání tabulek nenastala chyba.",
 						"type": "Lookup",
 						"dependsOn": [
 							{
@@ -2538,6 +2547,7 @@
 					},
 					{
 						"name": "LoadAll",
+						"description": "Spuštění načítání stage tabulek, dimenzionálních a faktových tabulek a procesování analytických databází.",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
@@ -2568,6 +2578,7 @@
 					},
 					{
 						"name": "LogETLStatus",
+						"description": "Změna stavu logu na úspěšný nebo chybový stav.",
 						"type": "Switch",
 						"dependsOn": [
 							{
